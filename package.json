@@ -1,0 +1,26 @@
+{
+  "name": "mobstt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@elbrus/eslint-config": "^1.1.0",
+    "@elbrus/eslint-plugin": "^1.0.1",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^1.0.0",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-speech-recognition": "^4.0.1"
+  }
+}
