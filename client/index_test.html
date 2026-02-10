@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to Server App</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+        #status { margin-bottom: 20px; color: #555; }
+        #recordBtn { padding: 20px 40px; font-size: 1.2rem; border: none; border-radius: 50px; background-color: #007bff; color: white; cursor: pointer; transition: background 0.3s; }
+        #recordBtn:disabled { background-color: #ccc; }
+        #transcript { margin-top: 20px; font-style: italic; color: #333; max-width: 80%; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="status">Press the button and say something...</div>
+    <button id="recordBtn">Start Speaking</button>
+    <div id="transcript"></div>
+
+    <script>
+        // Check for browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            alert("Your browser does not support the Web Speech API. Please try Chrome or Safari.");
+        } else {
+            const recognition = new SpeechRecognition();
+            const btn = document.getElementById('recordBtn');
+            const status = document.getElementById('status');
+            const transcriptDiv = document.getElementById('transcript');
+
+            recognition.continuous = false; // Stops after one phrase
+            recognition.lang = 'en-US'; // Set your preferred language
+
+            btn.addEventListener('click', () => {
+                recognition.start();
+                btn.disabled = true;
+                status.innerText = "Listening...";
+            });
+
+            recognition.onresult = (event) => {
+                const phrase = event.results[0][0].transcript;
+                transcriptDiv.innerText = `You said: "${phrase}"`;
+                sendToServer(phrase);
+            };
+
+            recognition.onend = () => {
+                btn.disabled = false;
+                status.innerText = "Processing complete.";
+            };
+
+            async function sendToServer(text) {
+                // const myJson = {
+                //   phrase: "hello world",
+                // };
+                status.innerText = "Sending to server...";
+                try {
+                    const response = await fetch('http://192.168.0.158:3000/receive', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        // body: JSON.stringify(myJson)
+                        body: JSON.stringify({ phrase: text })
+                    });
+                    
+                    if (response.ok) {
+                        status.innerText = "Server received the phrase!";
+                    } else {
+                        status.innerText = "Server error.";
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    status.innerText = "Connection failed.";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

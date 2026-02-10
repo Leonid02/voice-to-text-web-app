@@ -1,0 +1,31 @@
+{
+  "name": "voice-to-text-app",
+  "version": "1.0.0",
+  "description": "A web application that recognizes speech on mobile and sends it to a Node.js server.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "javascript",
+  "devDependencies": {
+    "@elbrus/eslint-config": "^1.1.0",
+    "@elbrus/eslint-plugin": "^1.0.1",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^1.0.0",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "react": "^19.2.4",
+    "react-speech-recognition": "^4.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -2,59 +2,50 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-const PORT = 3000;
 
+// 1. Port Configuration
+// process.env.PORT is required for cloud deployment (Render/Railway)
+const PORT = process.env.PORT || 3000;
 
+// 2. Middleware
+app.use(cors()); // Allows cross-origin requests
+app.use(express.json()); // Parses incoming JSON data
 
-// Middleware
-// app.use(cors()); // Allows your mobile app to talk to this server
-app.use(cors({
-    origin: '*', // For development, this allows all origins
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
-}));
-app.use(express.json()); // Tells the server to expect JSON data
-// Specific configuration is safer than just app.use(cors())
+// 3. Serve Static Files
+// This serves everything in your 'public' folder (index.html, css, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Add this AFTER your middleware and BEFORE your routes
-app.use(express.static('public')); 
-
-// Replace your app.get('/') with this:
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-    console.log(`dir nam = ${__dirname}`)
-});
-
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'index.html'));
-//     console.log(`dir nam = ${__dirname}`)
-// });
-
-// Or, add a simple test route for the root
-// app.get('/', (req, res) => {
-//     res.send('Server is running! Use your mobile app to send a POST request.');
-// });
-
-// The "Receive" Endpoint
+// 4. API Endpoint
+// This is where your mobile app sends the voice text
 app.post('/receive', (req, res) => {
-    const userPhrase = req.body.phrase;
+    const { phrase } = req.body;
 
-    if (!userPhrase) {
-        return res.status(400).json({ error: "No phrase received" });
+    if (!phrase) {
+        console.log("Empty phrase received.");
+        return res.status(400).json({ error: "No phrase found in request" });
     }
 
-    // This is where the magic happens!
-    console.log(`>>> Received from mobile: "${userPhrase}"`);
+    // LOGGING: You will see this in your Render/Railway logs
+    console.log(`[${new Date().toISOString()}] Received: "${phrase}"`);
 
-    // Add your logic here (e.g., save to DB, trigger an action)
-    
+    // RESPOND: Tell the mobile app we got it
     res.json({ 
-        message: "Phrase received successfully!", 
-        echo: userPhrase 
+        status: "success", 
+        message: "Server received your voice phrase!",
+        echo: phrase 
     });
 });
 
+// 5. Default Route
+// Ensures that visiting the root URL always loads the index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'index.html'));
+});
+
+// 6. Start Server
 app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-    console.log(`To test from mobile, use your computer's IP address instead of 'localhost'`);
+    console.log(`-----------------------------------------`);
+    console.log(`🚀 Server running on: http://localhost:${PORT}`);
+    console.log(`📁 Serving files from: ${path.join(__dirname, 'client')}`);
+    console.log(`-----------------------------------------`);
 });
